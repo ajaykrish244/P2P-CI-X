@@ -1,1 +1,1 @@
-# P2P-CI-X
+# P2P-Centralized Index
