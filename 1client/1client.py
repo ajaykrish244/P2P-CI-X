@@ -6,7 +6,7 @@ import datetime
 import pytz
 from pathlib import Path
 
-clientname = 'ajay'
+clientname = 'CLIENT1'
 
 
 def add_method(server,key,data):
