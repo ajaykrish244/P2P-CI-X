@@ -92,11 +92,5 @@ while True:
     print('Server listening')
     cs,ip=server.accept()
     # connect_new_client,(cs,ip)
-    threading._start_new_thread(connect_new_client(cs,ip))
-
-
-def handle_client(conn,addr):
-    pass
-
-def start():
-    pass    
+    threading._start_new_thread(connect_new_client,(cs,ip))
+ 
