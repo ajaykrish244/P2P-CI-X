@@ -7,10 +7,6 @@ import pytz
 from pathlib import Path
 
 clientname = 'rahul'
-# data = {
-#         '0791':'Internet Protocol',
-#         '0792':'Internet Control Message Protocol'
-#     }
 
 
 def add_method(server,key,data):
@@ -40,66 +36,59 @@ def request(key,port,server):
     l1=lines[1]
     l1=lines[0].split(" ")
     rfcnum = l1[3]
-    rfctitle=l1[1][5:]
+    rfctitle=lines[1][5:]
     print(lines)
     l5=lines[5]
     with open(f"./1client/{rfcnum} {rfctitle}", 'w') as f:
         f.write(l5)
-    #parse the response to make sense
-    # recieved data = conn.recv(2048)
     add_method(server,rfcnum,rfctitle)
 
 def GET(msg):
-    #parse RFC number and return
     lines=msg.split('\n')
     l1=lines[0].split(" ")
     return l1[1],l1[2]
 
 def response(cs,ip):
-    print(cs)
+    # print(cs)
     client_port = None
-    client_port=str(cs.getpeername()[1]-1)
-    try:
-        p2p_file=''
-        c=0
-        while True:
-            # cs.send(bytes(input('Enter msg:'),'utf-8'))
-            temp = cs.recv(2048, socket.MSG_PEEK)
-            length = temp.find(b'\n\n')
-            msg=str(cs.recv(length+2),encoding='utf-8')
-            print(msg)
-            if msg[:2] == 'GE':
-                rfcreq,version = GET(msg)
-                list_of_files = os.listdir("./2client") #list of files in the current directory
-                if(str.isnumeric(rfcreq)==False):
-                    data="400 Bad Request"
-                elif(version!='P2P-CI/1.0'):
-                    data="505 P2P-CI Version Not Supported"
-                else:
-                    for each_file in list_of_files:
-                        if each_file.startswith(str(rfcreq)):  #since its all type str you can simply use startswith
-                            c=c+1
-                            p2p_file=each_file
-                    if(c==0):
-                        data="404 Not Found"
-                    else:
-                        current_data_time=datetime.datetime.now(pytz.timezone('America/New_York'))
-                        o_s=platform.system()
-                        with open(f'./2client/{p2p_file}',"r") as f: 
-                            content_length=len(f.readlines())
-                        txt = Path(f'./2client/{p2p_file}').read_text()
-                        txt=txt.replace('\n', ' ')
-                        p2p_reponse=f"P2P-CI/1.0 200 OK {rfcreq}\n{p2p_file}\nDate: {current_data_time}\nOS: {o_s}\nContent-Length: {content_length}\nContent-Type: Text/Text\n{txt}\n\n"
-                        data = p2p_reponse
-                print(data)
-                cs.send(bytes(data,'utf-8'))
+    client_port=str(cs.getpeername()[1])
+    p2p_file=''
+    c=0
+    while True:
+        temp = cs.recv(2048, socket.MSG_PEEK)
+        length = temp.find(b'\n\n')
+        msg=str(cs.recv(length+2),encoding='utf-8')
+        # print(msg)
+        if msg[:2] == 'GE':
+            rfcreq,version = GET(msg)
+            list_of_files = os.listdir("./2client") 
+            if(str.isnumeric(rfcreq)==False):
+                data="400 Bad Request"
+            elif(version!='P2P-CI/1.0'):
+                data="505 P2P-CI Version Not Supported"
             else:
-                # Bad request response and other methods
-                pass     
-    except(ConnectionError or ConnectionResetError or ConnectionAbortedError):
-        print(f'\n\n\nError client {client_port}\n\n\n')
-        cs.close()
-
+                for each_file in list_of_files:
+                    if each_file.startswith(str(rfcreq)):  
+                        c=c+1
+                        p2p_file=each_file
+                if(c==0):
+                    data="404 Not Found"
+                else:
+                    current_data_time=datetime.datetime.now(pytz.timezone('America/New_York'))
+                    o_s=platform.system()
+                    with open(f'./2client/{p2p_file}',"r") as f: 
+                        content_length=len(f.readlines())
+                    txt = Path(f'./2client/{p2p_file}').read_text()
+                    txt=txt.replace('\n', ' ')
+                    p2p_reponse=f"P2P-CI/1.0 200 OK {rfcreq}\n{p2p_file}\nDate: {current_data_time}\nOS: {o_s}\nContent-Length: {content_length}\nContent-Type: Text/Text\n{txt}\n\n"
+                    data = p2p_reponse
+            cs.send(bytes(data,'utf-8'))
+            cs.close()
+            return 
+        else:
+            cs.send(bytes("400 Bad Request",'utf-8'))
+            cs.close()   
+            return
 
 
 if __name__=='__main__':
@@ -118,14 +107,14 @@ if __name__=='__main__':
 
     def ptop():
         while True:
-            print('Server listening')
+            # print('Server listening')
             cs,ip=p2p.accept()
             # connect_new_client,(cs,ip)
             threading._start_new_thread(response,(cs,ip))
 
     def ptos():
         global data
-        print(f"hi\n{data}")
+        print(f"{data}")
         server=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         server.connect((socket.gethostname(), 7734))
         print(f'Connted to server {server.getsockname()} {server.getpeername()}')

@@ -14,7 +14,7 @@ server=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 server.bind(ADDR)
 server.listen(5)
 
-def ADD(msg):
+def ADD(msg,localport):
     lines=msg.split('\n')
     l1=lines[0].split(" ")
     l2=lines[1].split(" ")
@@ -25,8 +25,9 @@ def ADD(msg):
     clientname = l2[1]
     portnumber=l3[1]
     title=l4[7:]
+    clientname=clientname+": "+portnumber
     
-    client_mapping[portnumber]=clientname
+    client_mapping[localport]=clientname
     if rfcnum in rfc_mapping.keys():
         #Skipping version checking
         rfc_mapping[rfcnum][1].append(clientname)
@@ -44,7 +45,7 @@ def LOOKUP(msg):
 def connect_new_client(cs,ip):
     print(cs)
     client_port = None
-    client_port=str(cs.getpeername()[1]-1)
+    client_port=str(cs.getpeername()[1])
     try:
         while True:
             # cs.send(bytes(input('Enter msg:'),'utf-8'))
@@ -53,7 +54,7 @@ def connect_new_client(cs,ip):
             msg=str(cs.recv(length+2),encoding='utf-8')
             print(msg)
             if msg[:2] == 'AD':
-                ADD(msg)
+                ADD(msg,client_port)
                 pp(client_mapping)
                 print('\n')
                 pp(rfc_mapping)
