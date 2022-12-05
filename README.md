@@ -21,5 +21,5 @@ If the user has selected `1`, now the user will have to enter the RFC number to 
 If the user has selected `2`, the entire RFC list along the cleints will be the output.
 
 ### Get Operation
-To execute the `3`, the user will first have to do the `List Operation`. From the output of the list operation, the user should see the RFC number they want and it's respective client port number. Based on this in the client terminal the user will enter RFC to recieve and cleint port number to requst. Followed by that, the file will be available in the client folder.</br><br/>
+If user wants to go with `3`, the user will first have to do the `List Operation`. From the output of the list operation, the user should see the RFC number they want and it's respective client port number. Based on this in the client terminal, the user will enter RFC to recieve and cleint port number to request. Followed by that, the file will be available in the client folder.</br><br/>
 For example, client 1 does not have RFC 1622. The user will have to enter 1622 and the client 2 port number on the client 1 powershell terminal. The file 1622 Pip Header Processing.txt will be availabe on the 1client folder now.
