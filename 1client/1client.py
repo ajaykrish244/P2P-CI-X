@@ -133,8 +133,13 @@ if __name__=='__main__':
                 print(data:=server.recv(2048))
             elif a==3:
                 key=input("Enter RFC file to recieve:")
-                clientport=int(input("Enter Client port to request transfer:"))
-                request(key,clientport,server)
+                if len(key)==4:
+                    clientport=int(input("Enter Client port to request transfer:"))
+                    request(key,clientport,server)
+                else:
+                    print("400 Bad Request")
+            else:
+                print("400 Bad Request")
 
     t1 = threading.Thread(target =ptop)
     t2 = threading.Thread(target =ptos)

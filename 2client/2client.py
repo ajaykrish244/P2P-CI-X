@@ -39,7 +39,7 @@ def request(key,port,server):
     rfctitle=lines[1][5:]
     print(lines)
     l5=lines[5]
-    with open(f"./1client/{rfcnum} {rfctitle}", 'w') as f:
+    with open(f"./2client/{rfcnum} {rfctitle}", 'w') as f:
         f.write(l5)
     add_method(server,rfcnum,rfctitle)
 
@@ -135,8 +135,13 @@ if __name__=='__main__':
                 print(data:=server.recv(2048))
             elif a==3:
                 key=input("Enter RFC file to recieve:")
-                clientport=int(input("Enter Client port to request transfer:"))
-                request(key,clientport,server)
+                if len(key)==4:
+                    clientport=int(input("Enter Client port to request transfer:"))
+                    request(key,clientport,server)
+                else:
+                    print("400 Bad Request")
+            else:
+                print("400 Bad Request")
 
     t1 = threading.Thread(target =ptop)
     t2 = threading.Thread(target =ptos)
