@@ -31,17 +31,23 @@ def request(key,port,server):
     temp = ss.recv(16048, socket.MSG_PEEK)
     length = temp.find(b'\n\n')
     msg=str(ss.recv(length+2),encoding='utf-8')
-    print(msg)
     lines=msg.split('\n')
-    l1=lines[1]
-    l1=lines[0].split(" ")
-    rfcnum = l1[3]
-    rfctitle=lines[1][5:]
-    print(lines)
-    l5=lines[5]
-    with open(f"./1client/{rfcnum} {rfctitle}", 'w') as f:
-        f.write(l5)
-    add_method(server,rfcnum,rfctitle)
+    if(lines[0]=="404 Not Found"):
+        print(msg)
+    elif(lines[0][0:3]=="400 Bad Request"):
+        print(msg)
+    elif(lines[0][0:3]=="505 P2P-CI Version Not Supported"):
+        print(msg)
+    else:
+        l1=lines[1]
+        l1=lines[0].split(" ")
+        rfcnum = l1[3]
+        rfctitle=lines[1][5:]
+        print(lines)
+        l5=lines[5]
+        with open(f"./1client/{rfcnum} {rfctitle}", 'w') as f:
+            f.write(l5)
+        add_method(server,rfcnum,rfctitle)
 
 def GET(msg):
     lines=msg.split('\n')
@@ -64,16 +70,16 @@ def response(cs,ip):
             rfcreq,version = GET(msg)
             list_of_files = os.listdir("./1client") 
             if(str.isnumeric(rfcreq)==False):
-                data="400 Bad Request"
+                data="400 Bad Request\n\n"
             elif(version!='P2P-CI/1.0'):
-                data="505 P2P-CI Version Not Supported"
+                data="505 P2P-CI Version Not Supported\n\n"
             else:
                 for each_file in list_of_files:
                     if each_file.startswith(str(rfcreq)):  
                         c=c+1
                         p2p_file=each_file
                 if(c==0):
-                    data="404 Not Found"
+                    data="404 Not Found\n\n"
                 else:
                     current_data_time=datetime.datetime.now(pytz.timezone('America/New_York'))
                     o_s=platform.system()
@@ -82,7 +88,7 @@ def response(cs,ip):
                     txt = Path(f'./1client/{p2p_file}').read_text()
                     txt=txt.replace('\n', ' ')
                     p2p_reponse=f"P2P-CI/1.0 200 OK {rfcreq}\n{p2p_file}\nDate: {current_data_time}\nOS: {o_s}\nContent-Length: {content_length}\nContent-Type: Text/Text\n{txt}\n\n"
-                    data = p2p_reponse      
+                    data = p2p_reponse   
             cs.send(bytes(data,'utf-8'))
             cs.close()
             return
